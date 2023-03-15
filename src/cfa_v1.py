@@ -11,7 +11,6 @@ class CFA_V1:
     forwarder = None
 
     def __init__(self, rpc: str, host_address: str, cfa_v1_address: str, cfa_v1_forwarder: str) -> None:
-        pass
         web3 = Web3(Web3.HTTPProvider(rpc))
         self.host = Host(host_address)
         self.contract = web3.eth.contract(address=cfa_v1_address, abi=CFA_V1_ABI)
