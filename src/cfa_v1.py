@@ -141,14 +141,14 @@ class CFA_V1:
         except Exception as e:
             raise SFError(e)
 
+# MANUAL TESTING
+# cfaV1Instance = CFA_V1(RPC_FOR_MUMBAI, HOST_ADDRESS, CFA_V1_ADDRESS,
+#                        CFA_V1_FORWARDER_ADDRESS)
+# super_token = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f"
+# sender = "0x74CDF863b00789c29734F8dFd9F83423Bc55E4cE"
+# flow_operator = "0x9e08f278C9DEa0d856CA8A281571320a52D85519"
 
-cfaV1Instance = CFA_V1(RPC_FOR_MUMBAI, HOST_ADDRESS, CFA_V1_ADDRESS,
-                       CFA_V1_FORWARDER_ADDRESS)
-super_token = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f"
-sender = "0x74CDF863b00789c29734F8dFd9F83423Bc55E4cE"
-flow_operator = "0x9e08f278C9DEa0d856CA8A281571320a52D85519"
-
-get_flow_operator_data_params = GetFlowOperatorDataParamsByID(
-    super_token, "0xff")
-response = cfaV1Instance.get_flow_operator_data_by_id(
-    get_flow_operator_data_params)
+# get_flow_operator_data_params = GetFlowOperatorDataParamsByID(
+#     super_token, "0xff")
+# response = cfaV1Instance.get_flow_operator_data_by_id(
+#     get_flow_operator_data_params)
