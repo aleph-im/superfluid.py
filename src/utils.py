@@ -16,5 +16,7 @@ def to_bytes32(string):
 def normalize_address(address: str) -> str:
     if is_address(address):
         return Web3.to_checksum_address(address)
+    elif address == "":
+        return ""
     else:
         raise InvalidAddressError("f{address} is invalid")

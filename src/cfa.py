@@ -4,9 +4,9 @@ from web3 import Web3
 
 from host import Host
 from constants import CFA_V1_ABI, CFA_V1_FORWARDER_ABI, RPC_FOR_MUMBAI, CFA_V1_ADDRESS, CFA_V1_FORWARDER_ADDRESS, HOST_ADDRESS
-from _types_ import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID
+from __types__ import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID, CreateFlowParams
 from errors import SFError
-from utils import to_bytes32
+from operation import Operation
 
 
 class CFA_V1:
@@ -136,19 +136,23 @@ class CFA_V1:
                 "permissions": transaction_response[0],
                 "flowRateAllowance": transaction_response[1]
             }
-            print(flow_operator_data)
             return flow_operator_data
         except Exception as e:
             raise SFError(e)
+
+    def createFlow(self, params: CreateFlowParams) -> Operation:
+        calldata = self.contract.encodeABI(fn_name='createFlow', args=[
+                                           params.super_token, params.receiver, params.flow_rate, "0x"])
+        # call_agreement_operation = self.host.functions.call_agreement(
+        #     self.contract.address, calldata, params.user_data)
+
 
 # MANUAL TESTING
 # cfaV1Instance = CFA_V1(RPC_FOR_MUMBAI, HOST_ADDRESS, CFA_V1_ADDRESS,
 #                        CFA_V1_FORWARDER_ADDRESS)
 # super_token = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f"
 # sender = "0x74CDF863b00789c29734F8dFd9F83423Bc55E4cE"
-# flow_operator = "0x9e08f278C9DEa0d856CA8A281571320a52D85519"
+# receiver = "0x9e08f278C9DEa0d856CA8A281571320a52D85519"
 
-# get_flow_operator_data_params = GetFlowOperatorDataParamsByID(
-#     super_token, "0xff")
-# response = cfaV1Instance.get_flow_operator_data_by_id(
-#     get_flow_operator_data_params)
+# create_flow_params = CreateFlowParams(True, receiver, super_token, 10)
+# response = cfaV1Instance.createFlow(create_flow_params)
