@@ -7,6 +7,7 @@ from constants import CFA_V1_ABI, CFA_V1_FORWARDER_ABI, RPC_FOR_MUMBAI, CFA_V1_A
 from __types__ import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID, CreateFlowParams
 from errors import SFError
 from operation import Operation
+from utils import to_bytes32
 
 
 class CFA_V1:
@@ -18,7 +19,8 @@ class CFA_V1:
 
     def __init__(self, rpc: str, host_address: str, cfa_v1_address: str, cfa_v1_forwarder: str) -> None:
         web3 = Web3(Web3.HTTPProvider(rpc))
-        self.host = Host(host_address)
+        web3.strict_bytes_type_checking = False
+        self.host = Host(rpc, host_address)
         self.contract = web3.eth.contract(
             address=cfa_v1_address, abi=CFA_V1_ABI)
         self.forwarder = web3.eth.contract(
@@ -140,19 +142,19 @@ class CFA_V1:
         except Exception as e:
             raise SFError(e)
 
-    def createFlow(self, params: CreateFlowParams) -> Operation:
+    def create_flow(self, params: CreateFlowParams) -> Operation:
         calldata = self.contract.encodeABI(fn_name='createFlow', args=[
                                            params.super_token, params.receiver, params.flow_rate, "0x"])
-        # call_agreement_operation = self.host.functions.call_agreement(
-        #     self.contract.address, calldata, params.user_data)
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, "0x")
 
 
 # MANUAL TESTING
 # cfaV1Instance = CFA_V1(RPC_FOR_MUMBAI, HOST_ADDRESS, CFA_V1_ADDRESS,
 #                        CFA_V1_FORWARDER_ADDRESS)
 # super_token = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f"
-# sender = "0x74CDF863b00789c29734F8dFd9F83423Bc55E4cE"
-# receiver = "0x9e08f278C9DEa0d856CA8A281571320a52D85519"
+# sender = "0xE895C0Cfb0f3CcE6844E9082989AC2Aa2ba8B253"
+# receiver = "0x1d19ef8FC94D8aF1EC921Fd0B4978831D147EBf8"
 
 # create_flow_params = CreateFlowParams(True, receiver, super_token, 10)
-# response = cfaV1Instance.createFlow(create_flow_params)
+# response = cfaV1Instance.create_flow(create_flow_params)

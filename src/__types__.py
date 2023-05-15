@@ -2,7 +2,7 @@ from typing import Optional
 
 from web3 import Web3
 
-from utils import normalize_address, to_bytes32
+from utils import normalize_address
 
 
 class GetFlowParams:
@@ -61,7 +61,7 @@ class GetFlowOperatorDataParamsByID:
             * @param flow_operator the flow operator
         """
         self.super_token = normalize_address(super_token)
-        self.flow_operator_id = to_bytes32(flow_operator_id)
+        self.flow_operator_id = flow_operator_id
 
 
 class ShouldUseCallAgreement:
