@@ -21,11 +21,11 @@ class Host:
 
     def call_agreement(self, agreement_address: str, calldata: str, user_data: str) -> Operation:
         try:
-            tx: TxParams = self.contract.functions.callAgreement(
+            txn: TxParams = self.contract.functions.callAgreement(
                 agreement_address, calldata, user_data).build_transaction({
                     "from": "0xE895C0Cfb0f3CcE6844E9082989AC2Aa2ba8B253"
                 })
-            return Operation(tx, BatchOperationType.SUPERFLUID_CALL_AGREEMENT)
+            return Operation(txn, BatchOperationType.SUPERFLUID_CALL_AGREEMENT)
         except Exception as e:
             raise e
 
