@@ -3,7 +3,7 @@ from enum import Enum
 
 from eth_typing import HexAddress
 
-from utils import normalize_address
+from .utils import normalize_address
 
 
 class GetFlowParams:
@@ -90,13 +90,13 @@ class ShouldUseCallAgreement:
 
 class ModifyFlowParams(ShouldUseCallAgreement):
 
-    flow_rate = None
-    receiver = None
-    sender = None
-    user_data = None
-    super_token = None
+    flow_rate: Optional[int] = None
+    receiver: HexAddress = None
+    sender: Optional[HexAddress] = None
+    user_data: Optional[bytes] = None
+    super_token: HexAddress = None
 
-    def __init__(self, should_use_call_agreement: bool, receiver: str, super_token: str, flow_rate: Optional[int] = None, sender: Optional[HexAddress] = None, user_data: Optional[bytes] = None) -> None:
+    def __init__(self, receiver: HexAddress, super_token: HexAddress, flow_rate: Optional[int] = None, sender: Optional[HexAddress] = None, user_data: Optional[bytes] = None, should_use_call_agreement: Optional[bool] = None) -> None:
         """
             * @param receiver - receiver of a flow
             * @param super_token - the super token of the agreement
@@ -114,15 +114,21 @@ class ModifyFlowParams(ShouldUseCallAgreement):
 
 class CreateFlowParams(ModifyFlowParams):
 
-    flow_rate: int = None
+    def __init__(self, sender: HexAddress, receiver: HexAddress, super_token: HexAddress, flow_rate: int, user_data: Optional[bytes] = None,  should_use_call_agreement: Optional[bool] = None) -> None:
 
-    def __init__(self, should_use_call_agreement: bool, receiver: str, super_token: str, flow_rate: int, sender: Optional[HexAddress] = None, user_data: Optional[str] = None) -> None:
-        """
-            * @param flow_rate flow rate for the flow
-        """
-        super().__init__(should_use_call_agreement, receiver,
-                         super_token, flow_rate, sender, user_data)
-        self.flow_rate = flow_rate
+        super().__init__(receiver,
+                         super_token, sender=sender, flow_rate=flow_rate, user_data=user_data, should_use_call_agreement=should_use_call_agreement)
+
+
+class UpdateFlowParams(CreateFlowParams):
+    pass
+
+
+class DeleteFlowParams(ModifyFlowParams):
+
+    def __init__(self, sender: HexAddress, receiver: HexAddress, super_token: HexAddress, flow_rate: Optional[int] = None, user_data: Optional[bytes] = None, should_use_call_agreement: Optional[bool] = None) -> None:
+        super().__init__(receiver,
+                         super_token, sender=sender, flow_rate=flow_rate, user_data=user_data, should_use_call_agreement=should_use_call_agreement)
 
 
 class BatchOperationType(Enum):

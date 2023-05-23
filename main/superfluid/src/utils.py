@@ -1,9 +1,9 @@
 from typing import Optional
 
-from eth_utils import is_address
+from eth_typing import HexAddress
 from web3 import Web3
 
-from errors import InvalidAddressError
+from .errors import InvalidAddressError
 
 
 def to_bytes32(string: str) -> bytes:
@@ -20,10 +20,8 @@ def to_bytes(string: str) -> bytes:
     return encoded_string
 
 
-def normalize_address(address: Optional[str] = None) -> str:
-    if is_address(address):
+def normalize_address(address: HexAddress) -> HexAddress:
+    if len(address) == 42 or 40:
         return Web3.to_checksum_address(address)
-    elif address == None:
-        return ""
     else:
-        raise InvalidAddressError("f{address} is invalid")
+        raise InvalidAddressError(f"{address} is invalid")

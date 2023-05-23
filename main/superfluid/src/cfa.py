@@ -1,14 +1,14 @@
-from typing import Dict, Optional
+from typing import Optional
 
 from web3 import Web3
 from web3.types import TxParams
 from web3.middleware import geth_poa_middleware
 
-from host import Host
-from constants import CFA_V1_ABI, CFA_V1_FORWARDER_ABI, RPC_FOR_MUMBAI, CFA_V1_ADDRESS, CFA_V1_FORWARDER_ADDRESS, HOST_ADDRESS, PRIVATE_KEY
-from __types__ import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID, CreateFlowParams, Web3FlowInfo, Web3FlowOperatorData, BatchOperationType
-from errors import SFError
-from operation import Operation
+from .host import Host
+from .constants import CFA_V1_ABI, CFA_V1_FORWARDER_ABI, RPC_FOR_MUMBAI, CFA_V1_ADDRESS, CFA_V1_FORWARDER_ADDRESS, HOST_ADDRESS, PRIVATE_KEY
+from .__types__ import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID, CreateFlowParams, UpdateFlowParams, DeleteFlowParams, Web3FlowInfo, UpdateFlowParams, Web3FlowOperatorData
+from .errors import SFError
+from .operation import Operation
 
 
 class CFA_V1:
@@ -120,7 +120,7 @@ class CFA_V1:
 
     def create_flow(self, params: CreateFlowParams) -> Operation:
         """
-            Creates a flow from sender to receiver
+            Creates a flow
             @param params - mainly holds the super token, sender, receiver and flow rate
             @returns - Operation
         """
@@ -128,12 +128,50 @@ class CFA_V1:
             calldata = self.contract.encodeABI(fn_name='createFlow', args=[
                 params.super_token, params.receiver, params.flow_rate, "0x"])
             call_agreement_operation = self.host.call_agreement(
-                self.contract.address, calldata, "0x")
+                self.contract.address, calldata, params.user_data or "0x")
             forwarder_txn: TxParams = self.forwarder.functions.createFlow(
                 params.super_token, params.sender, params.receiver, params.flow_rate, params.user_data or "0x").build_transaction({
                     "from": params.sender
                 })
-            return self._get_call_agreement_operation(call_agreement_operation, forwarder_txn, params.should_use_call_agreement or params.sender == None)
+            return self._get_call_agreement_operation(call_agreement_operation, forwarder_txn, params.should_use_call_agreement)
+        except Exception as e:
+            raise SFError(e)
+
+    def update_flow(self, params: UpdateFlowParams) -> Operation:
+        """
+            Updates a flow
+            @param params - mainly holds the super token, sender, receiver and flow rate
+            @returns - Operation
+        """
+        try:
+            calldata = self.contract.encodeABI(fn_name='updateFlow', args=[
+                params.super_token, params.receiver, params.flow_rate, "0x"])
+            call_agreement_operation = self.host.call_agreement(
+                self.contract.address, calldata, "0x")
+            forwarder_txn: TxParams = self.forwarder.functions.updateFlow(
+                params.super_token, params.sender, params.receiver, params.flow_rate, params.user_data or "0x").build_transaction({
+                    "from": params.sender
+                })
+            return self._get_call_agreement_operation(call_agreement_operation, forwarder_txn, params.should_use_call_agreement)
+        except Exception as e:
+            raise SFError(e)
+
+    def delete_flow(self, params: UpdateFlowParams) -> Operation:
+        """
+            Deletes a flow
+            @param params - mainly holds the super token, sender, receiver and flow rate
+            @returns - Operation
+        """
+        try:
+            calldata = self.contract.encodeABI(fn_name='deleteFlow', args=[
+                params.super_token, params.sender, params.receiver, "0x"])
+            call_agreement_operation = self.host.call_agreement(
+                self.contract.address, calldata, "0x")
+            forwarder_txn: TxParams = self.forwarder.functions.deleteFlow(
+                params.super_token, params.sender, params.receiver, params.user_data or "0x").build_transaction({
+                    "from": params.sender
+                })
+            return self._get_call_agreement_operation(call_agreement_operation, forwarder_txn, params.should_use_call_agreement)
         except Exception as e:
             raise SFError(e)
 
@@ -141,16 +179,28 @@ class CFA_V1:
         if should_use_call_agreement == True:
             return call_agreement_operation
         else:
-            return Operation(call_agreement_operation.txn, call_agreement_operation.type, forwarder_txn)
+            return Operation(call_agreement_operation.agreement_call, call_agreement_operation.type)
 
 
 # MANUAL TESTING
-# cfaV1Instance = CFA_V1(RPC_FOR_MUMBAI, HOST_ADDRESS, CFA_V1_ADDRESS,
-#                        CFA_V1_FORWARDER_ADDRESS)
-# super_token = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f"
-# sender = "0xE895C0Cfb0f3CcE6844E9082989AC2Aa2ba8B253"
-# receiver = "0xee793223abC645a415c3cBC97325F08629e775B7"
+cfaV1Instance = CFA_V1(RPC_FOR_MUMBAI, HOST_ADDRESS, CFA_V1_ADDRESS,
+                       CFA_V1_FORWARDER_ADDRESS)
+super_token = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f"
+sender = "0xE895C0Cfb0f3CcE6844E9082989AC2Aa2ba8B253"
+receiver = "0xafC09F8BF756E3A69579570bB1054B5a50E1ABd5"
 
 # create_flow_params = CreateFlowParams(None, receiver, super_token, 10, sender)
 # create_flow_operation = cfaV1Instance.create_flow(create_flow_params)
 # transaction_hash = create_flow_operation.exec(RPC_FOR_MUMBAI, PRIVATE_KEY)
+# print(transaction_hash)
+
+# update_flow_params = UpdateFlowParams(
+#     None, receiver, super_token, 100000000000000000000, sender)
+# update_flow_operation = cfaV1Instance.update_flow(update_flow_params)
+# transaction_hash = update_flow_operation.exec(RPC_FOR_MUMBAI, PRIVATE_KEY)
+# print(transaction_hash)
+
+# delete_flow_params = DeleteFlowParams(sender, receiver, super_token)
+# delete_flow_operation = cfaV1Instance.delete_flow(delete_flow_params)
+# transaction_hash = delete_flow_operation.exec(RPC_FOR_MUMBAI, PRIVATE_KEY)
+# print(transaction_hash)

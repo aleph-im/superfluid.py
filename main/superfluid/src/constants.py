@@ -3,17 +3,17 @@ from decouple import config
 import json
 
 
-with open("src/abis/cfa_v1.json") as cfa_v1:
+with open(".abis/cfa_v1.json") as cfa_v1:
     cfa_v1_abi = cfa_v1.read()
 
 CFA_V1_ABI = json.loads(cfa_v1_abi)
 
-with open("src/abis/cfa_v1_forwarder.json") as cfa_v1_forwarder:
+with open(".abis/cfa_v1_forwarder.json") as cfa_v1_forwarder:
     cfa_v1_forwarder_abi = cfa_v1_forwarder.read()
 
 CFA_V1_FORWARDER_ABI = json.loads(cfa_v1_forwarder_abi)
 
-with open("src/abis/host.json") as host:
+with open(".abis/host.json") as host:
     host_abi = host.read()
 
 HOST_ABI = json.loads(host_abi)

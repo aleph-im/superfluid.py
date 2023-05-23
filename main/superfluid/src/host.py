@@ -1,12 +1,12 @@
 from typing import Optional, Type
 
 from web3 import Web3
-from web3.types import TxParams
+from web3.contract.contract import ContractFunction
 from web3.middleware import geth_poa_middleware
 
-from constants import HOST_ABI
-from operation import Operation
-from __types__ import BatchOperationType
+from .constants import HOST_ABI
+from .operation import Operation
+from .__types__ import BatchOperationType
 
 
 class Host:
@@ -21,11 +21,9 @@ class Host:
 
     def call_agreement(self, agreement_address: str, calldata: str, user_data: str) -> Operation:
         try:
-            txn: TxParams = self.contract.functions.callAgreement(
-                agreement_address, calldata, user_data).build_transaction({
-                    "from": "0xE895C0Cfb0f3CcE6844E9082989AC2Aa2ba8B253"
-                })
-            return Operation(txn, BatchOperationType.SUPERFLUID_CALL_AGREEMENT)
+            agreement_call: ContractFunction = self.contract.functions.callAgreement(
+                agreement_address, calldata, user_data)
+            return Operation(agreement_call, BatchOperationType.SUPERFLUID_CALL_AGREEMENT)
         except Exception as e:
             raise e
 
