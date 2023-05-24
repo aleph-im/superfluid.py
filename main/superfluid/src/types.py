@@ -13,7 +13,7 @@ class GetFlowParams:
 
     def __init__(self, super_token: HexAddress, sender: HexAddress, receiver: HexAddress) -> None:
         """
-            * @param super_token - the superToken of the agreement
+            * @param super_token - The token to be flowed
             * @param sender - the sender of the flow
             * @param receiver - the receiver of the flow
         """
@@ -35,7 +35,7 @@ class GetAccountFlowInfoParams:
 
     def __init__(self, super_token: HexAddress, account: HexAddress) -> None:
         """
-            * @param super_token - the superToken of the agreement
+            * @param super_token - The token to be flowed
             * @param account - the account to get its info
         """
         self.super_token = normalize_address(super_token)
@@ -49,9 +49,9 @@ class GetFlowOperatorDataParams:
 
     def __init__(self, super_token: HexAddress, sender: HexAddress, flow_operator: HexAddress) -> None:
         """
-            * @param super_token - the superToken of the agreement
+            * @param super_token - The token to be flowed
             * @param sender - the sender of the flow
-            * @param flow_operator - the flow operator
+            * @param flow_operator - the spender
         """
         self.super_token = normalize_address(super_token)
         self.sender = normalize_address(sender)
@@ -70,8 +70,8 @@ class GetFlowOperatorDataParamsByID:
 
     def __init__(self, super_token: HexAddress, flow_operator_id: bytes) -> None:
         """
-            * @param super_token - the super token of the agreement
-            * @param flow_operator_id - the flow operator
+            * @param super_token -T he token to be flowed
+            * @param flow_operator_id - the flow operator id
         """
         self.super_token = normalize_address(super_token)
         self.flow_operator_id = flow_operator_id
@@ -99,7 +99,7 @@ class ModifyFlowParams(ShouldUseCallAgreement):
     def __init__(self, receiver: HexAddress, super_token: HexAddress, flow_rate: Optional[int] = None, sender: Optional[HexAddress] = None, user_data: Optional[bytes] = None, should_use_call_agreement: Optional[bool] = None) -> None:
         """
             * @param receiver - receiver of a flow
-            * @param super_token - the super token of the agreement
+            * @param super_token - The token to be flowed
             * @param flow_rate(Optional) - flow rate for the flow
             * @param sender(Optional) - sender of the flow
             * @param user_data(Optional) - user data for the flow
@@ -129,6 +129,35 @@ class DeleteFlowParams(ModifyFlowParams):
     def __init__(self, sender: HexAddress, receiver: HexAddress, super_token: HexAddress, flow_rate: Optional[int] = None, user_data: Optional[bytes] = None, should_use_call_agreement: Optional[bool] = None) -> None:
         super().__init__(receiver,
                          super_token, sender=sender, flow_rate=flow_rate, user_data=user_data, should_use_call_agreement=should_use_call_agreement)
+
+
+class SuperTokenFlowRateAllowanceParams:
+
+    flow_operator: HexAddress = None
+    flow_rate_allowance_delta: int = None
+    user_data: Optional[HexAddress] = None
+
+    def __init__(self, flow_operator: HexAddress, flow_rate_allowance_delta: int, user_data: Optional[bytes] = None) -> None:
+        """
+            * @param flow_operator - The operator of the flow
+            * @param flow_rate_allowance_delta - The amount to increase the flow rate allowance by
+            * @param user_data(Optional) - Extra user data provided
+        """
+        self.flow_operator = normalize_address(flow_operator)
+        self.flow_rate_allowance_delta = flow_rate_allowance_delta
+        self.user_data = user_data
+
+
+class FlowRateAllowanceParams(SuperTokenFlowRateAllowanceParams):
+
+    super_token: HexAddress = None
+
+    def __init__(self, super_token: HexAddress, flow_operator: HexAddress, flow_rate_allowance_delta: int, user_data: Optional[bytes] = None) -> None:
+        """
+            * @param super_token - super token
+        """
+        super().__init__(flow_operator, flow_rate_allowance_delta, user_data)
+        self.super_token = normalize_address(super_token)
 
 
 class BatchOperationType(Enum):

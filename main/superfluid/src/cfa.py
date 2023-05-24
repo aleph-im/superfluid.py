@@ -5,8 +5,8 @@ from web3.types import TxParams
 from web3.middleware import geth_poa_middleware
 
 from .host import Host
-from .constants import CFA_V1_ABI, CFA_V1_FORWARDER_ABI, RPC_FOR_MUMBAI, CFA_V1_ADDRESS, CFA_V1_FORWARDER_ADDRESS, HOST_ADDRESS, PRIVATE_KEY
-from .__types__ import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID, CreateFlowParams, UpdateFlowParams, DeleteFlowParams, Web3FlowInfo, UpdateFlowParams, Web3FlowOperatorData
+from .constants import CFA_V1_ABI, CFA_V1_FORWARDER_ABI
+from .types import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID, CreateFlowParams, UpdateFlowParams, DeleteFlowParams, Web3FlowInfo, UpdateFlowParams, Web3FlowOperatorData, FlowRateAllowanceParams
 from .errors import SFError
 from .operation import Operation
 
@@ -21,7 +21,6 @@ class CFA_V1:
     def __init__(self, rpc: str, host_address: str, cfa_v1_address: str, cfa_v1_forwarder: str) -> None:
         web3 = Web3(Web3.HTTPProvider(rpc))
         web3.middleware_onion.inject(geth_poa_middleware, layer=0)
-        # web3.strict_bytes_type_checking = False
         self.host = Host(rpc, host_address)
         self.contract = web3.eth.contract(
             address=cfa_v1_address, abi=CFA_V1_ABI)
@@ -156,7 +155,7 @@ class CFA_V1:
         except Exception as e:
             raise SFError(e)
 
-    def delete_flow(self, params: UpdateFlowParams) -> Operation:
+    def delete_flow(self, params: DeleteFlowParams) -> Operation:
         """
             Deletes a flow
             @param params - mainly holds the super token, sender, receiver and flow rate
@@ -175,32 +174,32 @@ class CFA_V1:
         except Exception as e:
             raise SFError(e)
 
-    def _get_call_agreement_operation(self, call_agreement_operation: Operation, forwarder_txn: TxParams, should_use_call_agreement: Optional[bool] = None) -> Operation:
+    def increase_flow_rate_allowance(self, params: FlowRateAllowanceParams) -> Operation:
+        """
+            Increases the flow rate allowance of a flow operator
+            @param params - holds the super token, flow operator, flow rate allowance delta and user data
+            @returns - Operation
+        """
+        calldata = self.contract.encodeABI(fn_name='increaseFlowRateAllowance', args=[
+            params.super_token, params.flow_operator, params.flow_rate_allowance_delta, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, params.user_data or "0x")
+        return call_agreement_operation
+
+    def decrease_flow_rate_allowance(self, params: FlowRateAllowanceParams) -> Operation:
+        """
+            Decreases the flow rate allowance of a flow operator
+            @param params - holds the super token, flow operator, flow rate allowance delta and user data
+            @returns - Operation
+        """
+        calldata = self.contract.encodeABI(fn_name='decreaseFlowRateAllowance', args=[
+            params.super_token, params.flow_operator, params.flow_rate_allowance_delta, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, params.user_data or "0x")
+        return call_agreement_operation
+
+    def _get_call_agreement_operation(self, call_agreement_operation: Operation, forwarder_txn: Optional[TxParams] = None, should_use_call_agreement: Optional[bool] = None) -> Operation:
         if should_use_call_agreement == True:
             return call_agreement_operation
         else:
-            return Operation(call_agreement_operation.agreement_call, call_agreement_operation.type)
-
-
-# MANUAL TESTING
-cfaV1Instance = CFA_V1(RPC_FOR_MUMBAI, HOST_ADDRESS, CFA_V1_ADDRESS,
-                       CFA_V1_FORWARDER_ADDRESS)
-super_token = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f"
-sender = "0xE895C0Cfb0f3CcE6844E9082989AC2Aa2ba8B253"
-receiver = "0xafC09F8BF756E3A69579570bB1054B5a50E1ABd5"
-
-# create_flow_params = CreateFlowParams(None, receiver, super_token, 10, sender)
-# create_flow_operation = cfaV1Instance.create_flow(create_flow_params)
-# transaction_hash = create_flow_operation.exec(RPC_FOR_MUMBAI, PRIVATE_KEY)
-# print(transaction_hash)
-
-# update_flow_params = UpdateFlowParams(
-#     None, receiver, super_token, 100000000000000000000, sender)
-# update_flow_operation = cfaV1Instance.update_flow(update_flow_params)
-# transaction_hash = update_flow_operation.exec(RPC_FOR_MUMBAI, PRIVATE_KEY)
-# print(transaction_hash)
-
-# delete_flow_params = DeleteFlowParams(sender, receiver, super_token)
-# delete_flow_operation = cfaV1Instance.delete_flow(delete_flow_params)
-# transaction_hash = delete_flow_operation.exec(RPC_FOR_MUMBAI, PRIVATE_KEY)
-# print(transaction_hash)
+            return Operation(call_agreement_operation.agreement_call, call_agreement_operation.type, forwarder_txn)

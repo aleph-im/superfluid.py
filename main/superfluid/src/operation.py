@@ -6,14 +6,14 @@ from web3 import Web3
 from eth_typing import HexStr
 from eth_account import Account
 
-from .__types__ import BatchOperationType
+from .types import BatchOperationType
 
 
 class Operation:
 
     agreement_call: ContractFunction = None
     type: BatchOperationType = None
-    forwarder_txn: TxParams = None
+    forwarder_txn: Optional[TxParams] = None
 
     def __init__(self, agreement_call: ContractFunction, type: BatchOperationType, forwarder_txn: Optional[TxParams] = None) -> None:
         self.agreement_call = agreement_call
@@ -21,6 +21,12 @@ class Operation:
         self.forwarder_txn = forwarder_txn
 
     def exec(self, rpc: str, private_key: str) -> HexStr:
+        """
+            Signs and broadcasts a transaction
+            @param rpc - rpc url
+            @param private_key - private key
+            @returns - HexStr - The transaction hash
+        """
         populated_transaction = self._get_populated_transaction_request(
             rpc, private_key)
         web3 = Web3(Web3.HTTPProvider(rpc))
@@ -31,6 +37,12 @@ class Operation:
         return transaction_hash.hex()
 
     def _get_populated_transaction_request(self, rpc: str, private_key: str) -> TxParams:
+        """
+            Selects and prepares the transaction object to be signed
+            @param rpc - rpc url
+            @param private_key - private key
+            @returns - TxParams - The transaction object
+        """
         populated_transaction = self.forwarder_txn if self.forwarder_txn is not None else self.agreement_call
         address = Account.from_key(private_key).address
         if populated_transaction == self.agreement_call:

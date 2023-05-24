@@ -4,4 +4,6 @@
 .vscode
 /build
 /dist
+run.py
+constants.py
 **/**/*.egg-info

@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 setup(
     name="superfluid",
-    version="0.0.12",
+    version="0.0.14",
     description="Python SDK for the Superfluid Protocol",
     package_dir={"": "main"},
     packages=find_packages(where="main"),

@@ -6,7 +6,7 @@ from web3.middleware import geth_poa_middleware
 
 from .constants import HOST_ABI
 from .operation import Operation
-from .__types__ import BatchOperationType
+from .types import BatchOperationType
 
 
 class Host:
