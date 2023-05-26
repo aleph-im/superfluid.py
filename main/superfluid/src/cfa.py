@@ -7,7 +7,7 @@ from web3.contract.contract import ContractFunction
 
 from .host import Host
 from .constants import CFA_V1_ABI, CFA_V1_FORWARDER_ABI
-from .types import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID, CreateFlowParams, UpdateFlowParams, DeleteFlowParams, Web3FlowInfo, UpdateFlowParams, Web3FlowOperatorData, FlowRateAllowanceParams, UpdateFlowOperatorPermissionsParams
+from .types import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID, CreateFlowParams, UpdateFlowParams, DeleteFlowParams, CreateFlowByOperatorParams, UpdateFlowByOperatorParams, Web3FlowInfo, UpdateFlowParams, Web3FlowOperatorData, FlowRateAllowanceParams, UpdateFlowOperatorPermissionsParams, FullControlParams
 from .errors import SFError
 from .operation import Operation
 
@@ -154,7 +154,7 @@ class CFA_V1:
     def delete_flow(self, params: DeleteFlowParams) -> Operation:
         """
             Deletes a flow
-            @param params - mainly holds the super token, sender, receiver and flow rate
+            @param params - mainly holds the super token, sender, and receiver
             @returns - Operation
         """
         calldata = self.contract.encodeABI(fn_name='deleteFlow', args=[
@@ -202,6 +202,73 @@ class CFA_V1:
         forwarder_call: ContractFunction = self.forwarder.functions.updateFlowOperatorPermissions(
             params.super_token, params.flow_operator, params.permissions, params.flow_rate_allowance)
         return self._get_call_agreement_operation(call_agreement_operation, forwarder_call, params.should_use_call_agreement)
+
+    def authorize_flow_operator_with_full_control(self, params: FullControlParams) -> Operation:
+        """
+            Give flow operator full control - max flow rate and create/update/delete permissions.
+            @param params - mainly holds the super token, flow operator, and user data
+            @returns - Operation
+        """
+        calldata = self.contract.encodeABI(fn_name='authorizeFlowOperatorWithFullControl', args=[
+            params.super_token, params.flow_operator, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, params.user_data or "0x")
+        forwarder_call: ContractFunction = self.forwarder.functions.grantPermissions(
+            params.super_token, params.flow_operator)
+        return self._get_call_agreement_operation(call_agreement_operation, forwarder_call, params.should_use_call_agreement)
+
+    def revoke_flow_operator_with_full_control(self, params: FullControlParams) -> Operation:
+        """
+            Revoke flow operator control - set flow rate to 0 with no permissions.
+            @param params - mainly holds the super token, flow operator, and user data
+            @returns - Operation
+        """
+        calldata = self.contract.encodeABI(fn_name='revokeFlowOperatorWithFullControl', args=[
+            params.super_token, params.flow_operator, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, params.user_data or "0x")
+        forwarder_call: ContractFunction = self.forwarder.functions.revokePermissions(
+            params.super_token, params.flow_operator)
+        return self._get_call_agreement_operation(call_agreement_operation, forwarder_call, params.should_use_call_agreement)
+
+    def create_flow_by_operator(self, params: CreateFlowByOperatorParams) -> Operation:
+        """
+            Create a flow as an operator
+            @param params - mainly holds the super token, sender, receiver and flow rate
+            @returns - Operation
+        """
+        calldata = self.contract.encodeABI(fn_name='createFlowByOperator', args=[
+            params.super_token, params.sender, params.receiver, params.flow_rate, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, params.user_data or "0x")
+        create_flow_operation = self.create_flow(params)
+        return self._get_call_agreement_operation(call_agreement_operation, create_flow_operation.forwarder_call, params.should_use_call_agreement)
+
+    def update_flow_by_operator(self, params: UpdateFlowByOperatorParams) -> Operation:
+        """
+            Update a flow as an operator
+            @param params - mainly holds the super token, sender, receiver and flow rate
+            @returns - Operation
+        """
+        calldata = self.contract.encodeABI(fn_name='updateFlowByOperator', args=[
+            params.super_token, params.sender, params.receiver, params.flow_rate, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, "0x")
+        update_flow_operation = self.update_flow(params)
+        return self._get_call_agreement_operation(call_agreement_operation, update_flow_operation.forwarder_call, params.should_use_call_agreement)
+
+    def delete_flow_by_operator(self, params: DeleteFlowParams) -> Operation:
+        """
+            Delete a flow as an operator
+            @param params - mainly holds the super token, sender, and receiver
+            @returns - Operation
+        """
+        calldata = self.contract.encodeABI(fn_name='deleteFlowByOperator', args=[
+            params.super_token, params.sender, params.receiver, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, "0x")
+        delete_flow_operation = self.delete_flow(params)
+        return self._get_call_agreement_operation(call_agreement_operation, delete_flow_operation.forwarder_call, params.should_use_call_agreement)
 
     def _get_call_agreement_operation(self, call_agreement_operation: Operation, forwarder_call: Optional[ContractFunction] = None, should_use_call_agreement: Optional[bool] = None) -> Operation:
         if should_use_call_agreement == True:
