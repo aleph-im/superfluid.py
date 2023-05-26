@@ -3,4 +3,8 @@ class InvalidAddressError(Exception):
 
 
 class SFError(Exception):
-    pass
+
+    def __init__(self, type: str, message: str, err: str = None) -> None:
+        self.error_message = str(
+            {"Type": type, "Message": message, "Error": err})
+        super().__init__(self.error_message)

@@ -13,12 +13,12 @@ class Operation:
 
     agreement_call: ContractFunction = None
     type: BatchOperationType = None
-    forwarder_txn: Optional[TxParams] = None
+    forwarder_call: Optional[ContractFunction] = None
 
-    def __init__(self, agreement_call: ContractFunction, type: BatchOperationType, forwarder_txn: Optional[TxParams] = None) -> None:
+    def __init__(self, agreement_call: ContractFunction, type: BatchOperationType, forwarder_call: Optional[ContractFunction] = None) -> None:
         self.agreement_call = agreement_call
         self.type = type
-        self.forwarder_txn = forwarder_txn
+        self.forwarder_call = forwarder_call
 
     def exec(self, rpc: str, private_key: str) -> HexStr:
         """
@@ -43,12 +43,11 @@ class Operation:
             @param private_key - private key
             @returns - TxParams - The transaction object
         """
-        populated_transaction = self.forwarder_txn if self.forwarder_txn is not None else self.agreement_call
+        call = self.forwarder_call if self.forwarder_call is not None else self.agreement_call
         address = Account.from_key(private_key).address
-        if populated_transaction == self.agreement_call:
-            populated_transaction = self.agreement_call.build_transaction({
-                "from": address
-            })
+        populated_transaction = call.build_transaction({
+            "from": address
+        })
         web3 = Web3(Web3.HTTPProvider(rpc))
         nonce = web3.eth.get_transaction_count(address)
         populated_transaction["nonce"] = nonce

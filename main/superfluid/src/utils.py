@@ -1,9 +1,8 @@
-from typing import Optional
-
 from eth_typing import HexAddress
 from web3 import Web3
 
 from .errors import InvalidAddressError
+from .constants import AUTHORIZE_FLOW_OPERATOR_CREATE, AUTHORIZE_FLOW_OPERATOR_DELETE, AUTHORIZE_FLOW_OPERATOR_UPDATE
 
 
 def to_bytes32(string: str) -> bytes:
@@ -25,3 +24,7 @@ def normalize_address(address: HexAddress) -> HexAddress:
         return Web3.to_checksum_address(address)
     else:
         raise InvalidAddressError(f"{address} is invalid")
+
+
+def is_permissions_clean(permissions: int) -> bool:
+    return ((permissions & ~(AUTHORIZE_FLOW_OPERATOR_CREATE | AUTHORIZE_FLOW_OPERATOR_UPDATE | AUTHORIZE_FLOW_OPERATOR_DELETE)) == 0)

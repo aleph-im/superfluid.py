@@ -3,10 +3,11 @@ from typing import Optional
 from web3 import Web3
 from web3.types import TxParams
 from web3.middleware import geth_poa_middleware
+from web3.contract.contract import ContractFunction
 
 from .host import Host
 from .constants import CFA_V1_ABI, CFA_V1_FORWARDER_ABI
-from .types import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID, CreateFlowParams, UpdateFlowParams, DeleteFlowParams, Web3FlowInfo, UpdateFlowParams, Web3FlowOperatorData, FlowRateAllowanceParams
+from .types import GetFlowParams, GetAccountFlowInfoParams, GetFlowOperatorDataParams, GetFlowOperatorDataParamsByID, CreateFlowParams, UpdateFlowParams, DeleteFlowParams, Web3FlowInfo, UpdateFlowParams, Web3FlowOperatorData, FlowRateAllowanceParams, UpdateFlowOperatorPermissionsParams
 from .errors import SFError
 from .operation import Operation
 
@@ -44,7 +45,8 @@ class CFA_V1:
             }
             return info
         except Exception as e:
-            raise SFError(e)
+            raise SFError(
+                "CFAV1_READ", "There was an error getting the flow", e)
 
     def get_account_flow_info(self, params: GetAccountFlowInfoParams) -> Web3FlowInfo:
         """
@@ -63,7 +65,8 @@ class CFA_V1:
             }
             return info
         except Exception as e:
-            raise SFError(e)
+            raise SFError(
+                "CFAV1_READ", "There was an error getting the account flow information", e)
 
     def get_net_flow(self, params: GetAccountFlowInfoParams) -> int:
         """
@@ -77,7 +80,8 @@ class CFA_V1:
             net_flow_rate = transaction_response
             return net_flow_rate
         except Exception as e:
-            raise SFError(e)
+            raise SFError(
+                "CFAV1_READ", "There was an error getting net flow", e)
 
     def get_flow_operator_data(self, params: GetFlowOperatorDataParams) -> Web3FlowOperatorData:
         """
@@ -96,7 +100,8 @@ class CFA_V1:
             }
             return flow_operator_data
         except Exception as e:
-            raise SFError(e)
+            raise SFError(
+                "CFAV1_READ", "There was an error getting flow operator data", e)
 
     def get_flow_operator_data_by_id(self, params: GetFlowOperatorDataParamsByID) -> Web3FlowOperatorData:
         """
@@ -115,7 +120,8 @@ class CFA_V1:
             }
             return flow_operator_data
         except Exception as e:
-            raise SFError(e)
+            raise SFError(
+                "CFAV1_READ", "There was an error getting flow operator data", e)
 
     def create_flow(self, params: CreateFlowParams) -> Operation:
         """
@@ -123,18 +129,13 @@ class CFA_V1:
             @param params - mainly holds the super token, sender, receiver and flow rate
             @returns - Operation
         """
-        try:
-            calldata = self.contract.encodeABI(fn_name='createFlow', args=[
-                params.super_token, params.receiver, params.flow_rate, "0x"])
-            call_agreement_operation = self.host.call_agreement(
-                self.contract.address, calldata, params.user_data or "0x")
-            forwarder_txn: TxParams = self.forwarder.functions.createFlow(
-                params.super_token, params.sender, params.receiver, params.flow_rate, params.user_data or "0x").build_transaction({
-                    "from": params.sender
-                })
-            return self._get_call_agreement_operation(call_agreement_operation, forwarder_txn, params.should_use_call_agreement)
-        except Exception as e:
-            raise SFError(e)
+        calldata = self.contract.encodeABI(fn_name='createFlow', args=[
+            params.super_token, params.receiver, params.flow_rate, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, params.user_data or "0x")
+        forwarder_call: ContractFunction = self.forwarder.functions.createFlow(
+            params.super_token, params.sender, params.receiver, params.flow_rate, params.user_data or "0x")
+        return self._get_call_agreement_operation(call_agreement_operation, forwarder_call, params.should_use_call_agreement)
 
     def update_flow(self, params: UpdateFlowParams) -> Operation:
         """
@@ -142,18 +143,13 @@ class CFA_V1:
             @param params - mainly holds the super token, sender, receiver and flow rate
             @returns - Operation
         """
-        try:
-            calldata = self.contract.encodeABI(fn_name='updateFlow', args=[
-                params.super_token, params.receiver, params.flow_rate, "0x"])
-            call_agreement_operation = self.host.call_agreement(
-                self.contract.address, calldata, "0x")
-            forwarder_txn: TxParams = self.forwarder.functions.updateFlow(
-                params.super_token, params.sender, params.receiver, params.flow_rate, params.user_data or "0x").build_transaction({
-                    "from": params.sender
-                })
-            return self._get_call_agreement_operation(call_agreement_operation, forwarder_txn, params.should_use_call_agreement)
-        except Exception as e:
-            raise SFError(e)
+        calldata = self.contract.encodeABI(fn_name='updateFlow', args=[
+            params.super_token, params.receiver, params.flow_rate, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, "0x")
+        forwarder_call: ContractFunction = self.forwarder.functions.updateFlow(
+            params.super_token, params.sender, params.receiver, params.flow_rate, params.user_data or "0x")
+        return self._get_call_agreement_operation(call_agreement_operation, forwarder_call, params.should_use_call_agreement)
 
     def delete_flow(self, params: DeleteFlowParams) -> Operation:
         """
@@ -161,18 +157,13 @@ class CFA_V1:
             @param params - mainly holds the super token, sender, receiver and flow rate
             @returns - Operation
         """
-        try:
-            calldata = self.contract.encodeABI(fn_name='deleteFlow', args=[
-                params.super_token, params.sender, params.receiver, "0x"])
-            call_agreement_operation = self.host.call_agreement(
-                self.contract.address, calldata, "0x")
-            forwarder_txn: TxParams = self.forwarder.functions.deleteFlow(
-                params.super_token, params.sender, params.receiver, params.user_data or "0x").build_transaction({
-                    "from": params.sender
-                })
-            return self._get_call_agreement_operation(call_agreement_operation, forwarder_txn, params.should_use_call_agreement)
-        except Exception as e:
-            raise SFError(e)
+        calldata = self.contract.encodeABI(fn_name='deleteFlow', args=[
+            params.super_token, params.sender, params.receiver, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, "0x")
+        forwarder_call: ContractFunction = self.forwarder.functions.deleteFlow(
+            params.super_token, params.sender, params.receiver, params.user_data or "0x")
+        return self._get_call_agreement_operation(call_agreement_operation, forwarder_call, params.should_use_call_agreement)
 
     def increase_flow_rate_allowance(self, params: FlowRateAllowanceParams) -> Operation:
         """
@@ -198,8 +189,22 @@ class CFA_V1:
             self.contract.address, calldata, params.user_data or "0x")
         return call_agreement_operation
 
-    def _get_call_agreement_operation(self, call_agreement_operation: Operation, forwarder_txn: Optional[TxParams] = None, should_use_call_agreement: Optional[bool] = None) -> Operation:
+    def update_flow_operator_permissions(self, params: UpdateFlowOperatorPermissionsParams) -> Operation:
+        """
+            Update permissions for a flow operator as a sender.
+            @param params - mainly holds the super token, flow operator, permissions, flow rate allowance and user data
+            @returns - Operation
+        """
+        calldata = self.contract.encodeABI(fn_name='updateFlowOperatorPermissions', args=[
+            params.super_token, params.flow_operator, params.permissions, params.flow_rate_allowance, "0x"])
+        call_agreement_operation = self.host.call_agreement(
+            self.contract.address, calldata, params.user_data or "0x")
+        forwarder_call: ContractFunction = self.forwarder.functions.updateFlowOperatorPermissions(
+            params.super_token, params.flow_operator, params.permissions, params.flow_rate_allowance)
+        return self._get_call_agreement_operation(call_agreement_operation, forwarder_call, params.should_use_call_agreement)
+
+    def _get_call_agreement_operation(self, call_agreement_operation: Operation, forwarder_call: Optional[ContractFunction] = None, should_use_call_agreement: Optional[bool] = None) -> Operation:
         if should_use_call_agreement == True:
             return call_agreement_operation
         else:
-            return Operation(call_agreement_operation.agreement_call, call_agreement_operation.type, forwarder_txn)
+            return Operation(call_agreement_operation.agreement_call, call_agreement_operation.type, forwarder_call)
