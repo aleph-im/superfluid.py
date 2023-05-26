@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to Superfluid Python SDK 👋
+<h1 align="center">Welcome to Superfluid Python SDK(Unofficial) 👋
 </h1>
 <div align="center">
 <img  width="300" padding="0 0 10px" alt="Superfluid logo" src="https://github.com/superfluid-finance/protocol-monorepo/raw/dev/sf-logo.png" />
