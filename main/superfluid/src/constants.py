@@ -1,7 +1,5 @@
 import json
 
-from decouple import config
-
 with open("./main/superfluid/src/abis/cfa_v1.json") as cfa_v1:
     cfa_v1_abi = cfa_v1.read()
 
@@ -21,10 +19,6 @@ with open("./main/superfluid/src/metadata/networks.json") as networks:
     networks = networks.read()
 
 NETWORKS = json.loads(networks)
-
-RPC_FOR_MUMBAI = config("RPC_FOR_MUMBAI")
-
-PRIVATE_KEY = config("PRIVATE_KEY")
 
 """
 ------- ACL AUTHORIZATION BIT OPERATIONS -------
