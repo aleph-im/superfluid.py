@@ -1,22 +1,19 @@
-from typing import Optional, TypedDict
+from typing import Optional, TypedDict, Dict
 from enum import Enum
 
-from eth_typing import HexAddress
+from eth_typing import HexAddress, HexStr
 
 from .utils import normalize_address, is_permissions_clean
 from .errors import SFError
 
 
 class GetFlowParams:
-    super_token: HexAddress = None
-    sender: HexAddress = None
-    receiver: HexAddress = None
 
     def __init__(self, super_token: HexAddress, sender: HexAddress, receiver: HexAddress) -> None:
         """
-            * @param super_token - The token to be flowed
-            * @param sender - the sender of the flow
-            * @param receiver - the receiver of the flow
+            @param super_token - The token to be flowed
+            @param sender - the sender of the flow
+            @param receiver - the receiver of the flow
         """
         self.super_token = normalize_address(super_token)
         self.sender = normalize_address(sender)
@@ -31,28 +28,23 @@ class Web3FlowInfo(TypedDict):
 
 
 class GetAccountFlowInfoParams:
-    super_token: HexAddress = None
-    account: HexAddress = None
 
     def __init__(self, super_token: HexAddress, account: HexAddress) -> None:
         """
-            * @param super_token - The token to be flowed
-            * @param account - the account to get its info
+            @param super_token - The token to be flowed
+            @param account - the account to get its info
         """
         self.super_token = normalize_address(super_token)
         self.account = normalize_address(account)
 
 
 class GetFlowOperatorDataParams:
-    super_token: HexAddress = None
-    sender: HexAddress = None
-    flow_operator: HexAddress = None
 
     def __init__(self, super_token: HexAddress, sender: HexAddress, flow_operator: HexAddress) -> None:
         """
-            * @param super_token - The token to be flowed
-            * @param sender - the sender of the flow
-            * @param flow_operator - the spender
+            @param super_token - The token to be flowed
+            @param sender - the sender of the flow
+            @param flow_operator - the spender
         """
         self.super_token = normalize_address(super_token)
         self.sender = normalize_address(sender)
@@ -60,19 +52,17 @@ class GetFlowOperatorDataParams:
 
 
 class Web3FlowOperatorData(TypedDict):
-    flowOperatorId: str
+    flowOperatorId: HexStr
     permissions: int
     flowRateAllowance: int
 
 
 class GetFlowOperatorDataParamsByID:
-    super_token: HexAddress = None
-    flow_operator_id: bytes = None
 
-    def __init__(self, super_token: HexAddress, flow_operator_id: bytes) -> None:
+    def __init__(self, super_token: HexAddress, flow_operator_id: HexStr) -> None:
         """
-            * @param super_token -T he token to be flowed
-            * @param flow_operator_id - the flow operator id
+            @param super_token - The token to be flowed
+            @param flow_operator_id - the flow operator id
         """
         self.super_token = normalize_address(super_token)
         self.flow_operator_id = flow_operator_id
@@ -80,42 +70,33 @@ class GetFlowOperatorDataParamsByID:
 
 class ShouldUseCallAgreement:
 
-    should_use_call_agreement: Optional[bool] = None
-
     def __init__(self, should_use_call_agreement: Optional[bool] = None) -> None:
         """
-            * @param should_use_call_agreement - whether or not to use the host contract
+            @param should_use_call_agreement - whether or not to use the host contract
         """
         self.should_use_call_agreement = should_use_call_agreement
 
 
 class UserData:
 
-    user_data: Optional[str] = None
-
-    def __init__(self, user_data: Optional[str] = None) -> None:
+    def __init__(self, user_data: Optional[HexStr] = None) -> None:
         """
-            * @param user_data - Extra data provided
+            @param user_data - Extra data provided
         """
         self.user_data = user_data
 
 
 class ModifyFlowParams(ShouldUseCallAgreement, UserData):
 
-    flow_rate: Optional[int] = None
-    receiver: HexAddress = None
-    sender: Optional[HexAddress] = None
-    super_token: HexAddress = None
-
-    def __init__(self, receiver: HexAddress, super_token: HexAddress, flow_rate: Optional[int] = None, sender: Optional[HexAddress] = None, user_data: Optional[str] = None, should_use_call_agreement: Optional[bool] = None) -> None:
+    def __init__(self, receiver: HexAddress, super_token: HexAddress, flow_rate: Optional[int] = None, sender: Optional[HexAddress] = None, user_data: Optional[HexStr] = None, should_use_call_agreement: Optional[bool] = None) -> None:
         """
-            * @param receiver - receiver of a flow
-            * @param super_token - The token to be flowed
-            * @param flow_rate(Optional) - flow rate for the flow
-            * @param sender(Optional) - sender of the flow
+            @param receiver - receiver of a flow
+            @param super_token - The token to be flowed
+            @param flow_rate(Optional) - flow rate for the flow
+            @param sender(Optional) - sender of the flow
         """
         super().__init__(should_use_call_agreement)
-        super(UserData, self).__init__(user_data)
+        UserData.__init__(self, user_data)
         self.receiver = normalize_address(receiver)
         self.super_token = normalize_address(super_token)
         self.flow_rate = flow_rate
@@ -124,7 +105,7 @@ class ModifyFlowParams(ShouldUseCallAgreement, UserData):
 
 class CreateFlowParams(ModifyFlowParams):
 
-    def __init__(self, sender: HexAddress, receiver: HexAddress, super_token: HexAddress, flow_rate: int, user_data: Optional[str] = None,  should_use_call_agreement: Optional[bool] = None) -> None:
+    def __init__(self, sender: HexAddress, receiver: HexAddress, super_token: HexAddress, flow_rate: int, user_data: Optional[HexStr] = None,  should_use_call_agreement: Optional[bool] = None) -> None:
 
         super().__init__(receiver,
                          super_token, sender=sender, flow_rate=flow_rate, user_data=user_data, should_use_call_agreement=should_use_call_agreement)
@@ -136,9 +117,9 @@ class UpdateFlowParams(CreateFlowParams):
 
 class DeleteFlowParams(ModifyFlowParams):
 
-    def __init__(self, sender: HexAddress, receiver: HexAddress, super_token: HexAddress, flow_rate: Optional[int] = None, user_data: Optional[str] = None, should_use_call_agreement: Optional[bool] = None) -> None:
+    def __init__(self, sender: HexAddress, receiver: HexAddress, super_token: HexAddress, user_data: Optional[HexStr] = None, should_use_call_agreement: Optional[bool] = None) -> None:
         super().__init__(receiver,
-                         super_token, sender=sender, flow_rate=flow_rate, user_data=user_data, should_use_call_agreement=should_use_call_agreement)
+                         super_token, sender=sender, user_data=user_data, should_use_call_agreement=should_use_call_agreement)
 
 
 class CreateFlowByOperatorParams(CreateFlowParams):
@@ -151,13 +132,10 @@ class UpdateFlowByOperatorParams(CreateFlowByOperatorParams):
 
 class SuperTokenFlowRateAllowanceParams(UserData):
 
-    flow_operator: HexAddress = None
-    flow_rate_allowance_delta: int = None
-
-    def __init__(self, flow_operator: HexAddress, flow_rate_allowance_delta: int, user_data: Optional[str] = None) -> None:
+    def __init__(self, flow_operator: HexAddress, flow_rate_allowance_delta: int, user_data: Optional[HexStr] = None) -> None:
         """
-            * @param flow_operator - The operator of the flow
-            * @param flow_rate_allowance_delta - The amount to increase the flow rate allowance by
+            @param flow_operator - The operator of the flow
+            @param flow_rate_allowance_delta - The amount to increase the flow rate allowance by
         """
         super().__init__(user_data)
         self.flow_operator = normalize_address(flow_operator)
@@ -166,11 +144,11 @@ class SuperTokenFlowRateAllowanceParams(UserData):
 
 class FlowRateAllowanceParams(SuperTokenFlowRateAllowanceParams):
 
-    super_token: HexAddress = None
-
-    def __init__(self, super_token: HexAddress, flow_operator: HexAddress, flow_rate_allowance_delta: int, user_data: Optional[str] = None) -> None:
-        """
-            * @param super_token - super token
+    def __init__(self, super_token: HexAddress, flow_operator: HexAddress, flow_rate_allowance_delta: int, user_data: Optional[HexStr] = None) -> None:
+        """ 
+            @param flow_operator - The operator of the flow
+            @param flow_rate_allowance_delta - The amount to increase the flow rate allowance by
+            @param super_token - super token
         """
         super().__init__(flow_operator, flow_rate_allowance_delta, user_data)
         self.super_token = normalize_address(super_token)
@@ -178,18 +156,14 @@ class FlowRateAllowanceParams(SuperTokenFlowRateAllowanceParams):
 
 class SuperTokenUpdateFlowOperatorPermissionsParams(ShouldUseCallAgreement, UserData):
 
-    flow_operator: HexAddress = None
-    permissions: int = None
-    flow_rate_allowance: int = None
-
-    def __init__(self, flow_operator: HexAddress, permissions: int, flow_rate_allowance: int, user_data: Optional[str] = None, should_use_call_agreement: Optional[bool] = None) -> None:
+    def __init__(self, flow_operator: HexAddress, permissions: int, flow_rate_allowance: int, user_data: Optional[HexStr] = None, should_use_call_agreement: Optional[bool] = None) -> None:
         """
-            * @param flow_operator - The operator of the flow
-            * @param permissions - Number specifying the permission type
-            * @param flow_rate_allowance - Allowance to an operator
+            @param flow_operator - The operator of the flow
+            @param permissions - Number specifying the permission type
+            @param flow_rate_allowance - Allowance to an operator
         """
         super().__init__(should_use_call_agreement)
-        super(UserData, self).__init__(user_data)
+        UserData.__init__(self, user_data)
         self.flow_operator = normalize_address(flow_operator)
         if is_permissions_clean(permissions):
             self.permissions = permissions
@@ -205,11 +179,12 @@ class SuperTokenUpdateFlowOperatorPermissionsParams(ShouldUseCallAgreement, User
 
 class UpdateFlowOperatorPermissionsParams(SuperTokenUpdateFlowOperatorPermissionsParams):
 
-    super_token: HexAddress = None
-
-    def __init__(self, super_token: HexAddress, flow_operator: HexAddress, permissions: int, flow_rate_allowance: int, user_data: Optional[str] = None, should_use_call_agreement: Optional[bool] = None) -> None:
+    def __init__(self, super_token: HexAddress, flow_operator: HexAddress, permissions: int, flow_rate_allowance: int, user_data: Optional[HexStr] = None, should_use_call_agreement: Optional[bool] = None) -> None:
         """
-            * @param super_token - The token to be flowed
+            @param super_token - The token to be flowed
+            @param flow_operator - The operator of the flow
+            @param permissions - Number specifying the permission type
+            @param flow_rate_allowance - Allowance to an operator
         """
         super().__init__(flow_operator, permissions,
                          flow_rate_allowance, user_data, should_use_call_agreement)
@@ -217,20 +192,24 @@ class UpdateFlowOperatorPermissionsParams(SuperTokenUpdateFlowOperatorPermission
 
 
 class SuperTokenFullControlParams(ShouldUseCallAgreement, UserData):
-    flow_operator: HexAddress = None
 
-    def __init__(self, flow_operator: HexAddress, should_use_call_agreement: Optional[bool] = None, user_data: Optional[str] = None) -> None:
+    def __init__(self, flow_operator: HexAddress, user_data: Optional[HexStr] = None, should_use_call_agreement: Optional[bool] = None) -> None:
+        """
+            @param flow_operator - The operator of the flow
+        """
         super().__init__(should_use_call_agreement)
-        super(UserData, self).__init__(user_data)
+        UserData.__init__(self, user_data)
         self.flow_operator = normalize_address(flow_operator)
 
 
 class FullControlParams(SuperTokenFullControlParams):
 
-    super_token: HexAddress = None
-
-    def __init__(self, super_token: HexAddress, flow_operator: HexAddress, should_use_call_agreement: Optional[bool] = None, user_data: Optional[str] = None) -> None:
-        super().__init__(flow_operator, should_use_call_agreement, user_data)
+    def __init__(self, super_token: HexAddress, flow_operator: HexAddress, user_data: Optional[HexStr] = None, should_use_call_agreement: Optional[bool] = None) -> None:
+        """
+            @param super_token - The token to be flowed
+            @param flow_operator - The operator of the flow
+        """
+        super().__init__(flow_operator, user_data, should_use_call_agreement)
         self.super_token = super_token
 
 
@@ -246,3 +225,23 @@ class BatchOperationType(Enum):
     SUPERTOKEN_DOWNGRADE = "SUPERTOKEN_DOWNGRADE"  # 102
     SUPERFLUID_CALL_AGREEMENT = "SUPERFLUID_CALL_AGREEMENT"  # 201
     CALL_APP_ACTION = "CALL_APP_ACTION"  # 202
+
+
+class NETWORK:
+
+    def __init__(self, network: Dict) -> None:
+        self.CHAIN_ID = network["chainId"]
+        self.RESOLVER = network["contractsV1"].get("resolver")
+        self.HOST = network["contractsV1"].get("host")
+        self.GOVERNANCE = network["contractsV1"].get("governance")
+        self.CFA_V1 = network["contractsV1"].get("cfaV1")
+        self.CFA_V1_FORWARDER = network["contractsV1"].get("cfaV1Forwarder")
+        self.IDA_V1 = network["contractsV1"].get("idaV1")
+        self.SUPER_TOKEN_FACTORY = network["contractsV1"].get(
+            "superTokenFactory")
+        self.SUPERFLUID_LOADER = network["contractsV1"].get("superfluidLoader")
+        self.TOGA = network["contractsV1"].get("toga")
+        self.BATCH_LIQUIDATOR = network["contractsV1"].get("batchLiquidator")
+        self.FLOW_SCHEDULER = network["contractsV1"].get("flowScheduler")
+        self.VESTING_SCHEDULER = network["contractsV1"].get("vestingScheduler")
+        self.SUPER_SPREADER = network["contractsV1"].get("superSpreader")

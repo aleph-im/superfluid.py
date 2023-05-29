@@ -17,18 +17,17 @@ with open("./main/superfluid/src/abis/host.json") as host:
 
 HOST_ABI = json.loads(host_abi)
 
+with open("./main/superfluid/src/metadata/networks.json") as networks:
+    networks = networks.read()
+
+NETWORKS = json.loads(networks)
+
 RPC_FOR_MUMBAI = config("RPC_FOR_MUMBAI")
-
-CFA_V1_ADDRESS = "0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873"
-
-HOST_ADDRESS = "0xEB796bdb90fFA0f28255275e16936D25d3418603"
-
-CFA_V1_FORWARDER_ADDRESS = "0xcfA132E353cB4E398080B9700609bb008eceB125"
 
 PRIVATE_KEY = config("PRIVATE_KEY")
 
 """
-/------- ACL AUTHORIZATION BIT OPERATIONS -------/
+------- ACL AUTHORIZATION BIT OPERATIONS -------
 """
 AUTHORIZE_FLOW_OPERATOR_CREATE = 1 << 0
 AUTHORIZE_FLOW_OPERATOR_UPDATE = 1 << 1

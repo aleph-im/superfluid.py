@@ -18,46 +18,99 @@
 
 ### 📖 [Docs](https://docs.superfluid.finance)
 
-<!-- # Introduction -->
+</br>
 
-<!-- superfluid.py is an application framework for interacting with the Superfluid Protocol without Solidity knowledge.
+# Introduction
 
-More specifically, SDK-Core is a wrapper library around `@superfluid-finance/ethereum-contracts` which allows web developers to interact with the Superfluid contracts.
-Under the hood, SDK-Core leverages TypeScript, ethers.js and The Graph and GraphQL. -->
-<!-- 
+superfluid.py is an application framework for interacting with the Superfluid Protocol without the Python Programming Language.
+
 # Features
 
-* Minimal Framework initialization (`chainId` and `provider`)
+* Minimal Framework initialization (`rpc` and `chain id`)
 * New Operation syntax for transactions
-* Create/Update/Delete Agreement Operations (Constant Flow Agreement and Instant Distribution Agreement)
-* SuperToken Operations
-* Subgraph-powered GraphQL querying with ordering and pagination
-* Event subscription
-* CFA/IDA/SuperToken Web3 Getters
-* Batch Call functionality for batching multiple Superfluid Operations in one transaction
+* Create/Update/Delete Agreement Operations (Constant Flow Agreement and Instant Distribution Agreement(In development))
 
 # Notable Used Technologies
 
-* TypeScript
-* Ethers
-* GraphQL
+* Python
+* Web3.py
 
-# Prerequisites
-
-> NOTE: You need to have graphql and ethers installed as a dependency in order to use SDK-Core:
+# Installation
 
 ```bash
-yarn install graphql ethers
+pip install superfluid
 ```
 
-To get the package up and running you'll need to install the necessary dependencies and build the project:
+# Usage
 
-```bash
-yarn install && yarn build
+```python
+from superfluid import CFA_V1
+
+rpc: str = "YOUR PREFERRED RPC"
+chain_id: int = "CHAIN ID"
+
+///////////////////////////////////////////////////////
+//////// CONSTANT FLOW AGREEMENT OPERATIONS ///////////
+///////////////////////////////////////////////////////
+
+cfaV1Instance = CFA_V1(rpc, chain_id)
+
+super_token: str = "SUPER TOKEN ADDRESS"
+sender: str = "SENDER ADDRESS"
+receiver: str = "RECEIVER ADDRESS"
+flow_rate: int = "FLOW RATE"
+
+PRIVATE_KEY: str = "YOUR PRIVATE KEY"
+OPERATOR_PRIVATE_KEY: str = "OPERATOR PRIVATE KEY"
+
+create_flow_operation = cfaV1Instance.create_flow(
+    sender, receiver, super_token, flow_rate)
+transaction_hash = create_flow_operation.exec(PRIVATE_KEY)
+
+update_flow_operation = cfaV1Instance.update_flow(
+    sender, receiver, super_token, flow_rate)
+transaction_hash = update_flow_operation.exec(PRIVATE_KEY)
+
+delete_flow_operation = cfaV1Instance.delete_flow(
+    sender, receiver, super_token)
+transaction_hash = delete_flow_operation.exec(PRIVATE_KEY)
+
+flow_operator: str = "OPERATOR ADDRESS"
+flow_rate_allowance_delta: int = "FLOW RATE ALLOWANCE DELTA"
+
+flow_rate_allowance_operation = cfaV1Instance.increase_flow_rate_allowance(
+    super_token, flow_operator, flow_rate_allowance_delta)
+transaction_hash = flow_rate_allowance_operation.exec(PRIVATE_KEY)
+
+flow_rate_allowance_operation = cfaV1Instance.decrease_flow_rate_allowance(
+    super_token, flow_operator, flow_rate_allowance_delta)
+transaction_hash = flow_rate_allowance_operation.exec(PRIVATE_KEY)
+
+permission: int = "VALID PERMISSION"
+
+update_flow_operator_permissions_operation = cfaV1Instance.update_flow_operator_permissions(
+    super_token, flow_operator, permission, flow_rate_allowance_delta)
+transaction_hash = update_flow_operator_permissions_operation.exec(PRIVATE_KEY)
+
+authorize_flow_operator_with_full_control_operation = cfaV1Instance.authorize_flow_operator_with_full_control(
+    super_token, flow_operator)
+transaction_hash = authorize_flow_operator_with_full_control_operation.exec(
+    PRIVATE_KEY)
+
+revoke_flow_operator_with_full_control_operation = cfaV1Instance.revoke_flow_operator_with_full_control(
+    super_token, flow_operator)
+transaction_hash = revoke_flow_operator_with_full_control_operation.exec(
+    PRIVATE_KEY)
+
+create_flow_operator_operation = cfaV1Instance.create_flow_by_operator(
+    sender, receiver, super_token, flow_rate)
+transaction_hash = create_flow_operator_operation.exec(OPERATOR_PRIVATE_KEY)
+
+update_flow_operator_operation = cfaV1Instance.update_flow_by_operator(
+    sender, receiver, super_token, flow_rate)
+transaction_hash = update_flow_operator_operation.exec(OPERATOR_PRIVATE_KEY)
+
+delete_flow_operator_operation = cfaV1Instance.delete_flow_by_operator(
+    sender, receiver, super_token)
+transaction_hash = delete_flow_operator_operation.exec(OPERATOR_PRIVATE_KEY)
 ```
-
-> NOTE: `yarn build` has a prerequisite that the contracts in `ethereum-contracts` have been built.
-
-# Tutorial
-
-For the best and most immersive experience of learning how to use the main sdk-core features, I would highly recommend heading over to our [interactive tutorials](https://docs.superfluid.finance/superfluid/protocol-developers/interactive-tutorials/sdk-initialization). -->

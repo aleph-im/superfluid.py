@@ -11,9 +11,8 @@ from .types import BatchOperationType
 
 class Host:
 
-    contract = None
-
     def __init__(self, rpc: str, host_address: str) -> None:
+        self.rpc = rpc
         web3 = Web3(Web3.HTTPProvider(rpc))
         web3.middleware_onion.inject(geth_poa_middleware, layer=0)
         self.contract = web3.eth.contract(
@@ -23,7 +22,7 @@ class Host:
         try:
             agreement_call: ContractFunction = self.contract.functions.callAgreement(
                 agreement_address, calldata, user_data)
-            return Operation(agreement_call, BatchOperationType.SUPERFLUID_CALL_AGREEMENT)
+            return Operation(self.rpc, agreement_call, BatchOperationType.SUPERFLUID_CALL_AGREEMENT)
         except Exception as e:
             raise e
 

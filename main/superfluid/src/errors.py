@@ -2,6 +2,10 @@ class InvalidAddressError(Exception):
     pass
 
 
+class InvalidChainId(Exception):
+    pass
+
+
 class SFError(Exception):
 
     def __init__(self, type: str, message: str, err: str = None) -> None:
