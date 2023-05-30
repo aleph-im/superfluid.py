@@ -22,7 +22,7 @@
 
 # Introduction
 
-superfluid.py is an application framework for interacting with the Superfluid Protocol without the Python Programming Language.
+superfluid.py is an application framework for interacting with the Superfluid Protocol using the Python Programming Language.
 
 # Features
 
