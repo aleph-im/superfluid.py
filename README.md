@@ -62,7 +62,6 @@ receiver: str = "RECEIVER ADDRESS"
 flow_rate: int = "FLOW RATE"
 
 PRIVATE_KEY: str = "YOUR PRIVATE KEY"
-OPERATOR_PRIVATE_KEY: str = "OPERATOR PRIVATE KEY"
 
 flow_data: Web3FlowInfo = cfaV1Instance.get_flow(super_token, sender, receiver)
 
