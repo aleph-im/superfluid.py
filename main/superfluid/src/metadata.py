@@ -1,4 +1,4 @@
-[
+networks = '''[
     {
         "name": "eth-goerli",
         "isTestnet": true,
@@ -472,4 +472,4 @@
         ],
         "coinGeckoId": "celo"
     }
-]
+]'''

@@ -1,22 +1,15 @@
 import json
+import os
 
-with open("./main/superfluid/src/abis/cfa_v1.json") as cfa_v1:
-    cfa_v1_abi = cfa_v1.read()
+from .abis import cfa_v1, cfa_v1_forwarder, host
+from .metadata import networks
 
-CFA_V1_ABI = json.loads(cfa_v1_abi)
 
-with open("./main/superfluid/src/abis/cfa_v1_forwarder.json") as cfa_v1_forwarder:
-    cfa_v1_forwarder_abi = cfa_v1_forwarder.read()
+CFA_V1_ABI = json.loads(cfa_v1)
 
-CFA_V1_FORWARDER_ABI = json.loads(cfa_v1_forwarder_abi)
+CFA_V1_FORWARDER_ABI = json.loads(cfa_v1_forwarder)
 
-with open("./main/superfluid/src/abis/host.json") as host:
-    host_abi = host.read()
-
-HOST_ABI = json.loads(host_abi)
-
-with open("./main/superfluid/src/metadata/networks.json") as networks:
-    networks = networks.read()
+HOST_ABI = json.loads(host)
 
 NETWORKS = json.loads(networks)
 
