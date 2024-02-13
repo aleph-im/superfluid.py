@@ -20,7 +20,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent"
     ],
-    install_requires=["web3 == 6.3.0", "python-decouple==3.8"],
+    install_requires=["web3 ~= 6.5.0", "python-decouple==3.8"],
     extras_require={
         "dev": ["twine>=4.0.2"]
     },
