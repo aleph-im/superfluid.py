@@ -2,7 +2,6 @@ import unittest
 
 from main.superfluid import is_permissions_clean, validate_chain_id, get_network
 from main.superfluid import InvalidChainId
-from main.superfluid import types
 
 
 class TestPermissionChecker(unittest.TestCase):
