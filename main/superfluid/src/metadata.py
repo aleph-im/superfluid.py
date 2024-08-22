@@ -471,5 +471,38 @@ networks = '''[
             "https://rpc.ankr.com/celo"
         ],
         "coinGeckoId": "celo"
-    }
+    },
+    {
+        "name": "base-mainnet",
+        "isTestnet": false,
+        "networkId": 8453,
+        "chainId": 8453,
+        "shortName": "base",
+        "uppercaseName": "base-mainnet",
+        "humanReadableName": "Base Mainnet",
+        "nativeTokenSymbol": "ETH",
+        "contractsV1": {
+            "resolver": "0x6a214c324553F96F04eFBDd66908685525Da0E0d",
+            "host": "0x4C073B3baB6d8826b8C5b229f3cfdC1eC6E47E74",
+            "governance": "0x3a648764a6d66440ca096343937c711a7ac1b1e9",
+            "cfaV1": "0x19ba78B9cDB05A877718841c574325fdB53601bb",
+            "cfaV1Forwarder": "0xcfA132E353cB4E398080B9700609bb008eceB125",
+            "idaV1": "0x66DF3f8e14CF870361378d8F61356D15d9F425C4",
+            "superTokenFactory": "0xe20B9a38E0c96F61d1bA6b42a61512D56Fea1Eb3",
+            "superfluidLoader": "0x9F9EEd9Bbc38E9e0514fD9dFcc0Bca9869A9c534",
+            "toga": "0xA87F76e99f6C8Ff8996d14f550ceF47f193D9A09",
+            "flowScheduler": "0xC72CEd15204d02183c83fEbb918b183E400811Ee",
+            "vestingScheduler": "0xDF92D0E6Bcb9385FDe99aD21Ff5e47Fb47E3c6b2"
+        },
+        "startBlockV1": 18081759,
+        "logsQueryRange": 10000,
+        "explorer": "https://base.blockscout.com/",
+        "subgraphV1": {
+            "name": "",
+            "hostedEndpoint": ""
+        },
+        "publicRPCs": [
+            "https://mainnet.base.org"
+        ]
+    },
 ]'''
