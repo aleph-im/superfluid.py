@@ -498,8 +498,8 @@ networks = '''[
         "logsQueryRange": 10000,
         "explorer": "https://base.blockscout.com/",
         "subgraphV1": {
-            "name": "",
-            "hostedEndpoint": ""
+            "name": "protocol-v1-celo-mainnet",
+            "hostedEndpoint": "https://api.thegraph.com/subgraphs/name/superfluid-finance/protocol-v1-celo-mainnet"
         },
         "publicRPCs": [
             "https://mainnet.base.org"
