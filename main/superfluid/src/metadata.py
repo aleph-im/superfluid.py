@@ -504,5 +504,5 @@ networks = '''[
         "publicRPCs": [
             "https://mainnet.base.org"
         ]
-    },
+    }
 ]'''
