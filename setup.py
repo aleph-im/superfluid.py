@@ -4,14 +4,14 @@ with open("README.md") as f:
     long_description = f.read()
 
 setup(
-    name="superfluid",
-    version="0.2.0",
-    description="Python SDK for the Superfluid Protocol",
+    name="aleph-superfluid",
+    version="0.2.1",
+    description="Fork of the Python SDK for the Superfluid Protocol",
     package_dir={"": "main"},
     packages=find_packages(where="main"),
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Godspower-Eze/superfluid.py",
+    url="https://github.com/aleph-im/superfluid.py",
     author="Godspower-Eze",
     author_email="Godspowereze260@gmail.com",
     license="MIT",
