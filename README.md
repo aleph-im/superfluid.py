@@ -24,6 +24,8 @@
 
 superfluid.py is an application framework for interacting with the Superfluid Protocol using the Python Programming Language.
 
+This is a friendly fork that adds support for the Base blockchain. It may be deprecated once [merged upstream](https://github.com/Godspower-Eze/superfluid.py/pull/1).
+
 # Features
 
 * Minimal Framework initialization (`rpc` and `chain id`)
