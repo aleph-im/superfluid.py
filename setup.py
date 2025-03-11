@@ -5,7 +5,7 @@ with open("README.md", encoding="utf-8") as f:
 
 setup(
     name="aleph-superfluid",
-    version="0.2.1",
+    version="0.2.2",
     description="Fork of the Python SDK for the Superfluid Protocol",
     package_dir={"": "main"},
     packages=find_packages(where="main"),
