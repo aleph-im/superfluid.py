@@ -2,7 +2,7 @@ from typing import Optional
 
 from web3 import Web3
 from web3.types import TxParams
-from web3.middleware import geth_poa_middleware
+from web3.middleware import ExtraDataToPOAMiddleware
 from web3.contract.contract import ContractFunction
 from eth_typing import HexAddress, HexStr
 
@@ -20,7 +20,7 @@ class CFA_V1:
         self.rpc = rpc
         network = get_network(chain_id)
         web3 = Web3(Web3.HTTPProvider(rpc))
-        web3.middleware_onion.inject(geth_poa_middleware, layer=0)
+        web3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
         self.host = Host(rpc, network.HOST)
         self.contract = web3.eth.contract(
             address=network.CFA_V1, abi=CFA_V1_ABI)
