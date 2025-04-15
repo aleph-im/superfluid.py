@@ -2,7 +2,7 @@ from typing import Optional, Type
 
 from web3 import Web3
 from web3.contract.contract import ContractFunction
-from web3.middleware import geth_poa_middleware
+from web3.middleware import ExtraDataToPOAMiddleware
 
 from .constants import HOST_ABI
 from .operation import Operation
@@ -14,7 +14,7 @@ class Host:
     def __init__(self, rpc: str, host_address: str) -> None:
         self.rpc = rpc
         web3 = Web3(Web3.HTTPProvider(rpc))
-        web3.middleware_onion.inject(geth_poa_middleware, layer=0)
+        web3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
         self.contract = web3.eth.contract(
             address=host_address, abi=HOST_ABI)
 

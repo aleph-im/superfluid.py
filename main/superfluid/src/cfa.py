@@ -2,7 +2,7 @@ from typing import Optional
 
 from web3 import Web3
 from web3.types import TxParams
-from web3.middleware import geth_poa_middleware
+from web3.middleware import ExtraDataToPOAMiddleware
 from web3.contract.contract import ContractFunction
 from eth_typing import HexAddress, HexStr
 
@@ -20,7 +20,7 @@ class CFA_V1:
         self.rpc = rpc
         network = get_network(chain_id)
         web3 = Web3(Web3.HTTPProvider(rpc))
-        web3.middleware_onion.inject(geth_poa_middleware, layer=0)
+        web3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
         self.host = Host(rpc, network.HOST)
         self.contract = web3.eth.contract(
             address=network.CFA_V1, abi=CFA_V1_ABI)
@@ -157,7 +157,7 @@ class CFA_V1:
         """
         validated_params = CreateFlowParams(
             sender, receiver, super_token, flow_rate, user_data, should_use_call_agreement)
-        calldata = self.contract.encodeABI(fn_name='createFlow', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='createFlow', args=[
             validated_params.super_token, validated_params.receiver, validated_params.flow_rate, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, validated_params.user_data or "0x")
@@ -179,7 +179,7 @@ class CFA_V1:
         """
         validated_params = UpdateFlowParams(
             sender, receiver, super_token, flow_rate, user_data, should_use_call_agreement)
-        calldata = self.contract.encodeABI(fn_name='updateFlow', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='updateFlow', args=[
             validated_params.super_token, validated_params.receiver, validated_params.flow_rate, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, "0x")
@@ -200,7 +200,7 @@ class CFA_V1:
         """
         validated_params = DeleteFlowParams(
             sender, receiver, super_token, user_data, should_use_call_agreement)
-        calldata = self.contract.encodeABI(fn_name='deleteFlow', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='deleteFlow', args=[
             validated_params.super_token, validated_params.sender, validated_params.receiver, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, "0x")
@@ -220,7 +220,7 @@ class CFA_V1:
         """
         validated_params = FlowRateAllowanceParams(
             super_token, flow_operator, flow_rate_allowance_delta, user_data)
-        calldata = self.contract.encodeABI(fn_name='increaseFlowRateAllowance', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='increaseFlowRateAllowance', args=[
             validated_params.super_token, validated_params.flow_operator, validated_params.flow_rate_allowance_delta, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, validated_params.user_data or "0x")
@@ -238,7 +238,7 @@ class CFA_V1:
         """
         validated_params = FlowRateAllowanceParams(
             super_token, flow_operator, flow_rate_allowance_delta, user_data)
-        calldata = self.contract.encodeABI(fn_name='decreaseFlowRateAllowance', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='decreaseFlowRateAllowance', args=[
             validated_params.super_token, validated_params.flow_operator, validated_params.flow_rate_allowance_delta, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, validated_params.user_data or "0x")
@@ -257,7 +257,7 @@ class CFA_V1:
         """
         validated_params = UpdateFlowOperatorPermissionsParams(
             super_token, flow_operator, permissions, flow_rate_allowance, user_data, should_use_call_agreement)
-        calldata = self.contract.encodeABI(fn_name='updateFlowOperatorPermissions', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='updateFlowOperatorPermissions', args=[
             validated_params.super_token, validated_params.flow_operator, validated_params.permissions, validated_params.flow_rate_allowance, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, validated_params.user_data or "0x")
@@ -277,7 +277,7 @@ class CFA_V1:
         """
         validated_params = FullControlParams(
             super_token, flow_operator, user_data, should_use_call_agreement)
-        calldata = self.contract.encodeABI(fn_name='authorizeFlowOperatorWithFullControl', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='authorizeFlowOperatorWithFullControl', args=[
             validated_params.super_token, validated_params.flow_operator, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, validated_params.user_data or "0x")
@@ -297,7 +297,7 @@ class CFA_V1:
         """
         validated_params = FullControlParams(
             super_token, flow_operator, user_data, should_use_call_agreement)
-        calldata = self.contract.encodeABI(fn_name='revokeFlowOperatorWithFullControl', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='revokeFlowOperatorWithFullControl', args=[
             validated_params.super_token, validated_params.flow_operator, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, validated_params.user_data or "0x")
@@ -319,7 +319,7 @@ class CFA_V1:
         """
         validated_params = CreateFlowByOperatorParams(
             sender, receiver, super_token, flow_rate, user_data, should_use_call_agreement)
-        calldata = self.contract.encodeABI(fn_name='createFlowByOperator', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='createFlowByOperator', args=[
             validated_params.super_token, validated_params.sender, validated_params.receiver, validated_params.flow_rate, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, validated_params.user_data or "0x")
@@ -341,7 +341,7 @@ class CFA_V1:
         """
         validated_params = UpdateFlowByOperatorParams(
             sender, receiver, super_token, flow_rate, user_data, should_use_call_agreement)
-        calldata = self.contract.encodeABI(fn_name='updateFlowByOperator', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='updateFlowByOperator', args=[
             validated_params.super_token, validated_params.sender, validated_params.receiver, validated_params.flow_rate, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, "0x")
@@ -362,7 +362,7 @@ class CFA_V1:
         """
         validated_params = DeleteFlowParams(
             sender, receiver, super_token, user_data, should_use_call_agreement)
-        calldata = self.contract.encodeABI(fn_name='deleteFlowByOperator', args=[
+        calldata = self.contract.encode_abi(abi_element_identifier='deleteFlowByOperator', args=[
             validated_params.super_token, validated_params.sender, validated_params.receiver, "0x"])
         call_agreement_operation = self.host.call_agreement(
             self.contract.address, calldata, "0x")
